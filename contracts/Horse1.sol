@@ -19,9 +19,12 @@ contract HorseAuction1 is  Ownable, Whitelist {
     uint256 public constant DECIMALS = 10 ** 18; 
     uint256 public constant START = 1641820700; 
     uint256 public constant END = START + 6 minutes; 
-    uint256 public constant BASE = 5 ether;
+    uint256 public constant BASE = 0.1 ether;
+    uint256 public constant CUTTOFF = END + 24 hours; 
+
     uint256 internal highestBidAmount = BASE;
     address internal highestBidder;
+    
 
     mapping(address => uint256) public provided;
     mapping(address => uint256) private accumulated;
@@ -120,7 +123,7 @@ contract HorseAuction1 is  Ownable, Whitelist {
 
         require(isWhitelisted(msg.sender),"The address is not whitelisted");
 
-        provided[msg.sender] -= amount;
+        accumulated[msg.sender] -= amount;
 
     
 
@@ -139,10 +142,16 @@ contract HorseAuction1 is  Ownable, Whitelist {
      * - The auction must have been already ended.
      * - The contract must have BNB left.
      */
+
     function withdrawSaleFunds() external onlyOwner {
         require(END < block.timestamp, "The auction has not ended");
-        require(address(this).balance > 0, "Contract's balance is empty");
+        require(address(this).balance >= highestBidAmount, "Contract's balance should larger than highestBidAmount");
+        payable(owner()).transfer(highestBidAmount);
+    }
 
+    function withdrawRemainingFunds() external onlyOwner {
+        require(CUTTOFF < block.timestamp, "Only can withdraw remaining balance after cutoff time");
+        require(address(this).balance > 0, "Contract's balance is empty");
         payable(owner()).transfer(address(this).balance);
     }
 

@@ -26,7 +26,7 @@ contract Whitelist is Ownable {
      * @dev Adds a new address to the whitelist.
      * @param _addresses Array of addresses to be whitelisted. 
      */
-    function addBatch(address[] memory _addresses) public onlyOwner {
+    function addBatch(address[] calldata _addresses) public onlyOwner {
         for(uint i=0; i < _addresses.length; i++) {
             whitelist[_addresses[i]] = true;
             emit AddedToWhitelist(_addresses[i]);
@@ -46,7 +46,7 @@ contract Whitelist is Ownable {
      * @dev Removes a address from the whitelist.
      * @param _addresses Array of addresses to be whitelisted. 
      */
-    function removeBatch(address[] memory _addresses) public onlyOwner {
+    function removeBatch(address[] calldata _addresses) public onlyOwner {
         for(uint i=0; i < _addresses.length; i++) {
             whitelist[_addresses[i]] = false;
             emit RemovedFromWhitelist(_addresses[i]);
